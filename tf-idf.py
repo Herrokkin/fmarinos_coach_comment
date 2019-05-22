@@ -84,7 +84,7 @@ def calc_tfidf(sentence):
 
 
 if __name__ == '__main__':
-    # -----Google Spreadsheetから監督コメント取得-----
+    # -----Google Spreadsheetに保存した監督コメント取得-----
     year = 2019
     url = 'https://script.google.com/macros/s/AKfycbz3HCPGAaRk1fjBjgeJzUjTNwh8uW8MguJNM11VbSM1bVgEQAk/exec?year=' + str(year)
     response = requests.get(url)
