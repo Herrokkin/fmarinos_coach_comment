@@ -95,7 +95,7 @@ if __name__ == '__main__':
     # sentenceに格納
     sentence = []
     for match in json_data:
-        sentence.append(match['comment_halftime'].encode('utf-8'))
+        sentence.append(match['comment_fulltime'].encode('utf-8'))
 
     # print(json.dumps(sentence, ensure_ascii=False))
     calc_tfidf(sentence)
