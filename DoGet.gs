@@ -10,21 +10,31 @@ function doGet(e) {
   // -----Get Spreadsheet Data-----
   var sheet_data = sheet.getRange(2, 1, lastRow - 1, lastColumn).getValues();
 
-  // データの成形
+  // Make data for response
   var responseList = [];
   sheet_data.map(function(d) {
     responseList.push({
       cup_title: d[0],
       matchday_no: d[1],
-      team: d[2],
+      team_against: d[2],
+      match_date: d[3],
       home_away_flag: d[4],
       comment_halftime: d[5],
       comment_fulltime: d[6],
-      match_results: d[7]
+      standings: d[7],
+      points: d[8],
+      win: d[9],
+      draw: d[10],
+      lose: d[11],
+      goals_for: d[12],
+      goals_against: d[13],
+      goal_difference: d[14],
+      match_result: d[15],
+      match_goals_for: d[16],
+      match_goals_against: d[17]
     });
   });
 
-  // レスポンス
   var response = {
     results: responseList,
     meta: {
