@@ -9,7 +9,7 @@ import json
 # http://pgt.hatenablog.jp/entry/2014/08/04/174123
 
 
-def calc_tfidf(sentence):
+def calc_tfidf(sentence, team_against, home_away_flag, match_result):
     num = len(sentence)
     result = []
 
@@ -72,13 +72,13 @@ def calc_tfidf(sentence):
         merge_tfidf[i] = tfidf
         tfidf = {}
 
-    print 'Matchday#        Word     TF-IDF'
+    print 'Matchday#, Team_Against, Home_Away, Word, TF-IDF'
 
-    for i in range(num):  # 降順に出力する
+    for i in range(num):  # tfidf降順に出力
         count_in_i = 0
         for word, count in sorted(merge_tfidf[i].items(), key=lambda x: x[1], reverse=True):
             if count_in_i < 5:  # 1節あたりn件のワードを抽出
-                print str(i + 1) + '      ' + str(word) + '       ' + str(round(count, 3))
+                print str(i + 1).zfill(2) + ', ' + team_against[i] + ', ' + home_away_flag[i] + ', ' + match_result[i] + ', ' + word + ', ' + str(round(count, 3))
                 count_in_i += 1
 # -----END TF-IDF-----
 
@@ -92,10 +92,23 @@ if __name__ == '__main__':
     json_data = json.loads(data)
     json_data = json_data['results']
 
-    # sentenceに格納
+    # sentenceにコメント格納
     sentence = []
     for match in json_data:
         sentence.append(match['comment_fulltime'].encode('utf-8'))
 
+    # その他試合情報を格納
+    team_against = []
+    for match in json_data:
+        team_against.append(match['team_against'].encode('utf-8'))
+
+    home_away_flag = []
+    for match in json_data:
+        home_away_flag.append(match['home_away_flag'].encode('utf-8'))
+
+    match_result = []
+    for match in json_data:
+        match_result.append(match['match_result'].encode('utf-8'))
+
     # print(json.dumps(sentence, ensure_ascii=False))
-    calc_tfidf(sentence)
+    calc_tfidf(sentence, team_against, home_away_flag, match_result)
