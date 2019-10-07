@@ -72,7 +72,7 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
         merge_tfidf[i] = tfidf
         tfidf = {}
 
-    print 'Matchday#, Team_Against, Home_Away, Word, TF-IDF'
+    print 'Matchday#, Team_Against, Home_Away, Match_Result, Word, TF-IDF'
 
     for i in range(num):  # tfidf降順に出力
         count_in_i = 0

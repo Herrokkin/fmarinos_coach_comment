@@ -1,4 +1,4 @@
-Matchday#, Team_Against, Home_Away, Word, TF-IDF
+Matchday#, Team_Against, Home_Away, Match_Result, Word, TF-IDF
 01, ガンバ大阪, Away, Win, 集中, 0.104
 01, ガンバ大阪, Away, Win, れ, 0.077
 01, ガンバ大阪, Away, Win, 切り替える, 0.077

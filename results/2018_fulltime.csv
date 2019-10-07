@@ -1,4 +1,4 @@
-Matchday#, Team_Against, Home_Away, Word, TF-IDF
+Matchday#, Team_Against, Home_Away, Match_Result, Word, TF-IDF
 01, セレッソ大阪, Away, Draw, 公式, 0.053
 01, セレッソ大阪, Away, Draw, ACL, 0.038
 01, セレッソ大阪, Away, Draw, すでに, 0.038
