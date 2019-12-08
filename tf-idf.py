@@ -77,7 +77,7 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
     for i in range(num):  # tfidf降順に出力
         count_in_i = 0
         for word, count in sorted(merge_tfidf[i].items(), key=lambda x: x[1], reverse=True):
-            if count_in_i < 5:  # 1節あたりn件のワードを抽出
+            if count_in_i < 10:  # 1節あたりn件のワードを抽出
                 print str(i + 1).zfill(2) + ', ' + team_against[i] + ', ' + home_away_flag[i] + ', ' + match_result[i] + ', ' + word + ', ' + str(round(count, 3))
                 count_in_i += 1
 # -----END TF-IDF-----
