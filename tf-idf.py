@@ -4,6 +4,7 @@ import MeCab
 import math
 import requests
 import json
+import urllib2
 
 # -----BEGIN TF-IDF-----
 # http://pgt.hatenablog.jp/entry/2014/08/04/174123
@@ -30,13 +31,28 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
     wordList = []
     sum = 0
 
+    # Stop words
+    # src(1) http://testpy.hatenablog.com/entry/2016/10/05/004949
+    # src(2) https://www.japannetbank.co.jp/jnb_toto/team_list.html
+    slothlib_path = 'http://svn.sourceforge.jp/svnroot/slothlib/CSharp/Version1/SlothLib/NLP/Filter/StopWord/word/Japanese.txt'
+    slothlib_file = urllib2.urlopen(slothlib_path)
+    slothlib_stopwords = [line.decode('utf-8').strip()
+                          for line in slothlib_file]
+    slothlib_stopwords = [ss for ss in slothlib_stopwords if not ss == u'']
+
+    my_stopwords = ['-', '－', '“', '”', '…', 'ヴィッセル神戸', '神戸', '浦和レッズ', '浦和', 'FC東京', 'Ｆ東京', '大分トリニータ', '大分', '鹿島アントラーズ', '鹿島', '川崎フロンターレ', '川崎', 'ガンバ大阪', 'Ｇ大阪', 'サガン鳥栖', '鳥栖',
+                    'サンフレッチェ広島', '広島', '清水エスパルス', '清水', 'ジュビロ磐田', '磐田', '湘南ベルマーレ', '湘南', 'セレッソ大阪', 'Ｃ大阪', '名古屋グランパス', '名古屋', 'ベガルタ仙台', '仙台', '北海道コンサドーレ札幌', '札幌', '松本山雅FC', '松本', '横浜F・マリノス', '横浜Ｍ']
+    slothlib_stopwords.extend(word.decode('utf-8')
+                              for word in my_stopwords)  # my_stopwordsをutf-8化して追加
+
     for i in range(num):
         wordList.append(result[i].split()[:-1:2])  # wordListに分解された単語要素のみを格納
 
     for i in range(num):
         for word in wordList[i]:
-            allCount[i] = wordCount.setdefault(word, 0)
-            wordCount[word] += 1
+            if word.decode('utf-8') not in slothlib_stopwords:  # リストからストップワードを削除
+                allCount[i] = wordCount.setdefault(word, 0)
+                wordCount[word] += 1
         allCount[i] = wordCount  # 単語出現回数を文章ごとに格納。tfの分母に相当
         wordCount = {}
 
@@ -86,7 +102,8 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
 if __name__ == '__main__':
     # -----Google Spreadsheetに保存した監督コメント取得-----
     year = 2019
-    url = 'https://script.google.com/macros/s/AKfycbz3HCPGAaRk1fjBjgeJzUjTNwh8uW8MguJNM11VbSM1bVgEQAk/exec?year=' + str(year)
+    url = 'https://script.google.com/macros/s/AKfycbz3HCPGAaRk1fjBjgeJzUjTNwh8uW8MguJNM11VbSM1bVgEQAk/exec?year=' + \
+        str(year)
     response = requests.get(url)
     data = response.text
     json_data = json.loads(data)
