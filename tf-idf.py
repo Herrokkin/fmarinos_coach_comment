@@ -5,19 +5,36 @@ import math
 import requests
 import json
 import urllib2
+import mojimoji
 
 # -----BEGIN TF-IDF-----
 # http://pgt.hatenablog.jp/entry/2014/08/04/174123
 
 
 def calc_tfidf(sentence, team_against, home_away_flag, match_result):
+    # Stop words
+    # src(1) http://testpy.hatenablog.com/entry/2016/10/05/004949
+    # src(2) https://www.japannetbank.co.jp/jnb_toto/team_list.html
+    slothlib_path = 'http://svn.sourceforge.jp/svnroot/slothlib/CSharp/Version1/SlothLib/NLP/Filter/StopWord/word/Japanese.txt'
+    slothlib_file = urllib2.urlopen(slothlib_path)
+    slothlib_stopwords = [line.decode('utf-8').strip()
+                          for line in slothlib_file]
+    slothlib_stopwords = [ss for ss in slothlib_stopwords if not ss == u'']
+
+    my_stopwords = ['－', '“', '”', '…',
+                    'ヴィッセル神戸', '神戸', 'ヴィッセル', '浦和レッズ', '浦和', 'レッズ', 'ＦＣ東京', 'Ｆ東京', '東京', '大分トリニータ', '大分', 'トリニータ',
+                    '鹿島アントラーズ', '鹿島', 'アントラーズ', '川崎フロンターレ', '川崎', 'フロンターレ', 'ガンバ大阪', 'Ｇ大阪', 'ガンバ', 'Ｇ', '大阪',
+                    'サガン鳥栖', '鳥栖', 'サガン', 'サンフレッチェ広島', '広島', 'サンフレッチェ', '清水エスパルス', '清水', 'エスパルス', 'ジュビロ磐田', '磐田', 'ジュビロ',
+                    '湘南ベルマーレ', '湘南', 'ベルマーレ', 'セレッソ大阪', 'Ｃ大阪', 'セレッソ', 'Ｃ', '大阪', '名古屋グランパス', '名古屋', 'グランパス',
+                    'ベガルタ仙台', '仙台', 'ベガルタ', '北海道コンサドーレ札幌', '札幌', 'コンサドーレ', '松本山雅ＦＣ', '松本', '山雅',
+                    '横浜F・マリノス', '横浜Ｍ', 'Ｆ', 'マリノス']
+
+    slothlib_stopwords.extend(word.decode('utf-8')
+                              for word in my_stopwords)  # my_stopwordsをutf-8化して追加
+
     num = len(sentence)
     result = []
-
-    for i in range(num):  # 文章の分解
-        tagger = MeCab.Tagger()
-        result.append(tagger.parse(sentence[i]))
-
+    result_node = []
     wordCount = {}
     allCount = {}
     sub_tfstore = {}
@@ -31,19 +48,9 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
     wordList = []
     sum = 0
 
-    # Stop words
-    # src(1) http://testpy.hatenablog.com/entry/2016/10/05/004949
-    # src(2) https://www.japannetbank.co.jp/jnb_toto/team_list.html
-    slothlib_path = 'http://svn.sourceforge.jp/svnroot/slothlib/CSharp/Version1/SlothLib/NLP/Filter/StopWord/word/Japanese.txt'
-    slothlib_file = urllib2.urlopen(slothlib_path)
-    slothlib_stopwords = [line.decode('utf-8').strip()
-                          for line in slothlib_file]
-    slothlib_stopwords = [ss for ss in slothlib_stopwords if not ss == u'']
-
-    my_stopwords = ['-', '－', '“', '”', '…', 'ヴィッセル神戸', '神戸', '浦和レッズ', '浦和', 'FC東京', 'Ｆ東京', '大分トリニータ', '大分', '鹿島アントラーズ', '鹿島', '川崎フロンターレ', '川崎', 'ガンバ大阪', 'Ｇ大阪', 'サガン鳥栖', '鳥栖',
-                    'サンフレッチェ広島', '広島', '清水エスパルス', '清水', 'ジュビロ磐田', '磐田', '湘南ベルマーレ', '湘南', 'セレッソ大阪', 'Ｃ大阪', '名古屋グランパス', '名古屋', 'ベガルタ仙台', '仙台', '北海道コンサドーレ札幌', '札幌', '松本山雅FC', '松本', '横浜F・マリノス', '横浜Ｍ']
-    slothlib_stopwords.extend(word.decode('utf-8')
-                              for word in my_stopwords)  # my_stopwordsをutf-8化して追加
+    for i in range(num):  # 文章の分解
+        tagger = MeCab.Tagger()
+        result.append(tagger.parse(sentence[i]))
 
     for i in range(num):
         wordList.append(result[i].split()[:-1:2])  # wordListに分解された単語要素のみを格納
@@ -112,7 +119,9 @@ if __name__ == '__main__':
     # sentenceにコメント格納
     sentence = []
     for match in json_data:
-        sentence.append(match['comment_fulltime'].encode('utf-8'))
+        # 文書を全角へ変換 https://qiita.com/chamao/items/7edaba62b120a660657e
+        sentence_fullbyte = mojimoji.han_to_zen(match['comment_fulltime'])
+        sentence.append(sentence_fullbyte.encode('utf-8'))
 
     # その他試合情報を格納
     team_against = []
