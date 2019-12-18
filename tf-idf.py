@@ -12,7 +12,7 @@ import mojimoji
 
 
 def calc_tfidf(sentence, team_against, home_away_flag, match_result):
-    # Stop words
+    # -----BEGIN Stop words-----
     # src(1) http://testpy.hatenablog.com/entry/2016/10/05/004949
     # src(2) https://www.japannetbank.co.jp/jnb_toto/team_list.html
     slothlib_path = 'http://svn.sourceforge.jp/svnroot/slothlib/CSharp/Version1/SlothLib/NLP/Filter/StopWord/word/Japanese.txt'
@@ -21,8 +21,7 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
                           for line in slothlib_file]
     slothlib_stopwords = [ss for ss in slothlib_stopwords if not ss == u'']
 
-    my_stopwords = ['－', '“', '”', '…',
-                    'ヴィッセル神戸', '神戸', 'ヴィッセル', '浦和レッズ', '浦和', 'レッズ', 'ＦＣ東京', 'Ｆ東京', '東京', '大分トリニータ', '大分', 'トリニータ',
+    my_stopwords = ['ヴィッセル神戸', '神戸', 'ヴィッセル', '浦和レッズ', '浦和', 'レッズ', 'ＦＣ東京', 'Ｆ東京', '東京', '大分トリニータ', '大分', 'トリニータ',
                     '鹿島アントラーズ', '鹿島', 'アントラーズ', '川崎フロンターレ', '川崎', 'フロンターレ', 'ガンバ大阪', 'Ｇ大阪', 'ガンバ', 'Ｇ', '大阪',
                     'サガン鳥栖', '鳥栖', 'サガン', 'サンフレッチェ広島', '広島', 'サンフレッチェ', '清水エスパルス', '清水', 'エスパルス', 'ジュビロ磐田', '磐田', 'ジュビロ',
                     '湘南ベルマーレ', '湘南', 'ベルマーレ', 'セレッソ大阪', 'Ｃ大阪', 'セレッソ', 'Ｃ', '大阪', '名古屋グランパス', '名古屋', 'グランパス',
@@ -31,6 +30,7 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
 
     slothlib_stopwords.extend(word.decode('utf-8')
                               for word in my_stopwords)  # my_stopwordsをutf-8化して追加
+    # -----END Stop words-----
 
     num = len(sentence)
     result = []
@@ -53,7 +53,21 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
         result.append(tagger.parse(sentence[i]))
 
     for i in range(num):
-        wordList.append(result[i].split()[:-1:2])  # wordListに分解された単語要素のみを格納
+        word = result[i].split()[:-1:2]  # 単語
+        feature = result[i].split()[1:-1:2]  # 特徴(カンマ区切り)
+        word_to_remove = []  # 削除単語リスト
+
+        for j, feature_value in enumerate(feature):
+            pos = feature_value.split(',')[0]  # 品詞抽出
+
+            # 指定した名詞以外を削除単語リスト(word_to_remove)へ格納
+            if pos not in ["名詞", "動詞", "形容詞"]:
+                word_to_remove.append(word[j])
+
+        for k in word_to_remove:  # 削除リスト(word_to_remove)の単語を、wordから削除
+            word.remove(k)
+
+        wordList.append(word)  # wordListに分解された単語要素のみを格納
 
     for i in range(num):
         for word in wordList[i]:
