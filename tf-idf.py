@@ -122,7 +122,7 @@ def calc_tfidf(sentence, team_against, home_away_flag, match_result):
 
 if __name__ == '__main__':
     # -----Google Spreadsheetに保存した監督コメント取得-----
-    year = 2019
+    year = 2020
     url = 'https://script.google.com/macros/s/AKfycbz3HCPGAaRk1fjBjgeJzUjTNwh8uW8MguJNM11VbSM1bVgEQAk/exec?year=' + \
         str(year)
     response = requests.get(url)
