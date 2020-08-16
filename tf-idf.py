@@ -135,6 +135,7 @@ if __name__ == '__main__':
     for match in json_data:
         # 文書を全角へ変換 https://qiita.com/chamao/items/7edaba62b120a660657e
         sentence_fullbyte = mojimoji.han_to_zen(match['comment_fulltime'])
+        # sentence_fullbyte = mojimoji.han_to_zen(match['comment_halftime'])
         sentence.append(sentence_fullbyte.encode('utf-8'))
 
     # その他試合情報を格納
